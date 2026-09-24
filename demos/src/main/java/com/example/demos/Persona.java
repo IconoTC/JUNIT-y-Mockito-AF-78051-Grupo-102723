@@ -12,7 +12,7 @@ public class Persona {
 	public Persona(int id, String nombre, String apellidos, LocalDate fNacimiento) {
 		super();
 		this.id = id;
-		this.nombre = nombre;
+		setNombre(nombre);
 		this.apellidos = apellidos;
 		this.fNacimiento = fNacimiento;
 	}
@@ -27,6 +27,10 @@ public class Persona {
 		return nombre;
 	}
 	public void setNombre(String nombre) {
+		if(nombre == null)
+			throw new IllegalArgumentException("no puede ser nulo");
+		if(nombre.isBlank())
+			throw new IllegalArgumentException("no puede estar en blanco");
 		this.nombre = nombre;
 	}
 	public String getApellidos() {

@@ -55,12 +55,18 @@ class DummyTest {
 			}
 			
 			@ParameterizedTest(name = "{displayName} => {0} + {1} = {2}")
-			@CsvSource({"1,2,3","1,-2,-1", "0.1, 0.2, 0.3", "1,-0.9,0.1", "0,0,0" })
+			@CsvSource({
+				"1,2,3", // esto es para ...
+				"1,-2,-1", 
+				"0.1, 0.2, 0.3", 
+				"1,-0.9,0.1", 
+				"0,0,0" })
 			@DisplayName("Sumar")
 			void testSumas(double operando1, double operando2, double resultado) {
 				var actual = fixure.suma(operando1, operando2);
 				
 				assertEquals(resultado,  actual);
+//				assertEquals(operando1 + operando2,  actual);
 			}
 			
 			@ParameterizedTest(name = "{displayName} => {0} + {1} = {2}")
