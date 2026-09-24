@@ -11,6 +11,10 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("Pruebas de la clase Dummy")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -50,6 +54,24 @@ class DummyTest {
 				assertEquals(3.0, c.suma(2.0, 1.0));
 			}
 			
+			@ParameterizedTest(name = "{displayName} => {0} + {1} = {2}")
+			@CsvSource({"1,2,3","1,-2,-1", "0.1, 0.2, 0.3", "1,-0.9,0.1", "0,0,0" })
+			@DisplayName("Sumar")
+			void testSumas(double operando1, double operando2, double resultado) {
+				var actual = fixure.suma(operando1, operando2);
+				
+				assertEquals(resultado,  actual);
+			}
+			
+			@ParameterizedTest(name = "{displayName} => {0} + {1} = {2}")
+			@CsvFileSource(files = "casos-de-suma.csv", numLinesToSkip = 1)
+			@DisplayName("Dirigido por datos")
+			void testSumasFichero(double operando1, double operando2, double resultado) {
+				var actual = fixure.suma(operando1, operando2);
+				
+				assertEquals(resultado,  actual);
+			}
+			
 		}
 		@Nested
 		class KO {
@@ -61,7 +83,7 @@ class DummyTest {
 				var actual = c.suma(0.1, 0.2);
 				
 				assertEquals(0.3,  actual);
-				assertEquals(0.1,  c.suma(1, -0.9));
+				assertEquals(0.1,  c.suma(1, -0.9)); // mala practica
 			}
 			
 		}
@@ -103,6 +125,19 @@ class DummyTest {
 				var ex = assertThrows(ArithmeticException.class, () -> fixure.divide(1.0, 0.0));
 				assertEquals("/ by zero", ex.getMessage());
 //				assertEquals(Double.POSITIVE_INFINITY,  fixure.divide(1.0, 0.0));
+			}
+			@Test
+			@DisplayName("Divide por 0 real Sin Assert")
+			// @Disabled("Pendiente de solucion")
+			void testDivideDecimalSinAssert() {
+				try {
+					fixure.divide((double)1.0, (double)0.0);
+					fail("No ha dado la excepción");
+				} catch (ArithmeticException ex) {
+					assertEquals("/ by zero", ex.getMessage());
+				} catch (Exception ex) {
+					fail("Ha dado una excepción " + ex.getClass().getCanonicalName());
+				}
 			}
 			
 		}

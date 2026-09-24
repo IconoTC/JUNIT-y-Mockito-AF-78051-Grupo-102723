@@ -59,6 +59,12 @@ public class Persona {
 		return id == other.id;
 	}
 	
+	@Override
+	public String toString() {
+		return "Persona [id=" + id + ", nombre=" + nombre + ", apellidos=" + apellidos + ", fNacimiento=" + fNacimiento
+				+ "]";
+	}
+
 	public boolean isValid() {
 		return nombre != null && !nombre.isBlank() && nombre.length() <= 50;
 	}
