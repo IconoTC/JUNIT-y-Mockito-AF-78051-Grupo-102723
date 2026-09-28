@@ -24,5 +24,11 @@ public class Dummy {
 				.setScale(16, RoundingMode.HALF_UP)
 				.doubleValue();
 	}
+	
+	public double sumaLenta(double a, double b) throws InterruptedException {
+			Thread.sleep(1000);
+		return roundIEEE754(a + b);
+	}
+	
 
 }

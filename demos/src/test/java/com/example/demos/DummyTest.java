@@ -1,23 +1,41 @@
 package com.example.demos;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
+
+import com.example.test.anotations.Smoke;
+import com.example.test.anotations.UnitTest;
+import com.example.test.utils.PrivateMethod;
 
 @DisplayName("Pruebas de la clase Dummy")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DummyTest {
 	Dummy fixure;
 	
@@ -35,8 +53,10 @@ class DummyTest {
 	}
 
 	@Nested
+	@Order(10)
 	class Metodo_Suma {
 		@Nested
+		@Order(1)
 		class OK {
 			@Test
 			void test_Suma_dos_enteros() {
@@ -53,6 +73,18 @@ class DummyTest {
 				
 				assertEquals(3.0, c.suma(2.0, 1.0));
 			}
+			double result;
+			
+			@Test
+			@Timeout(unit = TimeUnit.SECONDS, value = 100)
+			void test_Suma_Lenta() throws InterruptedException {
+				var c = new Dummy();
+				
+//				assertTimeout(Duration.ofMillis(10), () -> result = c.sumaLenta(2.0, 1.0));
+//				assertEquals(3.0, result);
+				assertEquals(3.0, c.sumaLenta(2.0, 1.0));
+			}
+			
 			
 			@ParameterizedTest(name = "{displayName} => {0} + {1} = {2}")
 			@CsvSource({
@@ -62,6 +94,8 @@ class DummyTest {
 				"1,-0.9,0.1", 
 				"0,0,0" })
 			@DisplayName("Sumar")
+			//@Tag("smocke")
+			@Smoke
 			void testSumas(double operando1, double operando2, double resultado) {
 				var actual = fixure.suma(operando1, operando2);
 				
@@ -80,6 +114,7 @@ class DummyTest {
 			
 		}
 		@Nested
+		@Order(2)
 		class KO {
 			@Test
 			@DisplayName("Valida el error de precisión IEEE754")
@@ -96,8 +131,11 @@ class DummyTest {
 		
 	}
 	@Nested
+	@UnitTest
+	@Order(40)
 	class Metodo_Divide {
 		@Nested
+		@Order(1)
 		class OK {
 			@Test
 			@DisplayName("Divide dos enteros")
@@ -108,6 +146,8 @@ class DummyTest {
 			}
 			@Test
 			@DisplayName("Divide dos decimales")
+			@Smoke
+			@UnitTest
 			void testDivideReales() {
 				var actual = fixure.divide(1.0, 2);
 				
@@ -116,6 +156,7 @@ class DummyTest {
 			
 		}
 		@Nested
+		@Order(2)
 		class KO {
 			@Test
 			@DisplayName("Divide por 0")
@@ -150,5 +191,17 @@ class DummyTest {
 		
 	}
 
+	@Nested
+	@UnitTest
+	@Order(5)
+	class Metodo_Privado {
+		@Test
+		void testRoundIEEE754() throws NoSuchMethodException, SecurityException, IllegalAccessException, InvocationTargetException {
+//			var actual = fixure.roundIEEE754(0.1 + 0.2);
+			var actual = PrivateMethod.exec(fixure, "roundIEEE754", new Class[] { double.class }, (0.1 + 0.2));
+			
+			assertEquals(0.3,  actual);
+		}
+	}
 
 }
