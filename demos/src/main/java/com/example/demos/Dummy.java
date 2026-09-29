@@ -29,6 +29,21 @@ public class Dummy {
 			Thread.sleep(1000);
 		return roundIEEE754(a + b);
 	}
+	public boolean esBisiesto(int año) {
+		return (esMultiploDe4(año) && noEsMultiploDe100(año)) || esMultiploDe400(año);
+//		if(año == 2024) return true;
+//		if(año == 2023) return false;
+//		throw new RuntimeException("No contemplado");
+	}
+	private boolean esMultiploDe400(int año) {
+		return año % 400 == 0;
+	}
+	private boolean noEsMultiploDe100(int año) {
+		return año % 100 != 0;
+	}
+	private boolean esMultiploDe4(int año) {
+		return año % 4 == 0;
+	}
 	
 
 }

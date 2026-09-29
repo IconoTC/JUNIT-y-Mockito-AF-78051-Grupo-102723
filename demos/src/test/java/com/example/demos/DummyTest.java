@@ -1,8 +1,10 @@
 package com.example.demos;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.example.test.anotations.Smoke;
 import com.example.test.anotations.UnitTest;
@@ -201,6 +204,31 @@ class DummyTest {
 			var actual = PrivateMethod.exec(fixure, "roundIEEE754", new Class[] { double.class }, (0.1 + 0.2));
 			
 			assertEquals(0.3,  actual);
+		}
+	}
+	
+//	Reglas de validación del bisiesto
+//	Divisible por 4: Si el año se puede dividir exactamente entre 4, 
+//		por lo general es bisiesto (como 2024 o 2028).
+//	Excepción de los siglos (divisible por 100): Si el año termina en dos ceros y es divisible entre 100,
+//		no es bisiesto.
+//	Contraexcepción (divisible por 400): Si ese mismo año de fin de siglo también es divisible entre 400,
+//		sí es bisiesto. Por ejemplo, el año 1900 no fue bisiesto, pero el año 2000 sí lo fue. 
+	@Nested
+	@UnitTest
+	@Order(1)
+	class Metodo_EsBisiesto {
+		@ParameterizedTest(name = "El año {0} ES bisiesto")
+		@ValueSource(ints = {2024, 2000})
+		void OK(int caso) {
+			var actual = fixure.esBisiesto(caso);
+			assertTrue(actual);
+		}
+		@ParameterizedTest(name = "El año {0} NO ES bisiesto")
+		@ValueSource(ints = {2023, 1900})
+		void KO(int caso) {
+			var actual = fixure.esBisiesto(caso);
+			assertFalse(actual);
 		}
 	}
 

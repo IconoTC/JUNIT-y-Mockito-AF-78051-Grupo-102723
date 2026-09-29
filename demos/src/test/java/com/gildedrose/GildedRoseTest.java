@@ -4,28 +4,20 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
-import java.util.List;
-
-import org.approvaltests.Approvals;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import org.junit.jupiter.params.provider.CsvSource;
 
 //@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class GildedRoseTest {
 
-    @Test
-    void foo() {
-        Item[] items = new Item[] { new Item("foo", 0, 0) };
-        GildedRose app = new GildedRose(items);
-        app.updateQuality();
-        assertEquals("foo", app.items[0].name);
-    }
+//    @Test
+//    void foo() {
+//        Item[] items = new Item[] { new Item("foo", 0, 0) };
+//        GildedRose app = new GildedRose(items);
+//        app.updateQuality();
+//        assertEquals("foo", app.items[0].name);
+//    }
 
 //	@Test
 //	@DisplayName("No lanza excepciones inesperadas (dispara artificalmente la cobertura de código)")
@@ -126,7 +118,7 @@ class GildedRoseTest {
 //        		);
 //	}
 //	
-//	@Disabled
+////	@Disabled
 //	@ParameterizedTest(name = "{index} => sellIn: {0} quality: {1} –> sellIn: {2} quality: {3}")
 //	@CsvSource({
 //		"11, 10, 10, 8",
@@ -153,7 +145,7 @@ class GildedRoseTest {
 	@CsvFileSource(resources = "/gildedrose-test-case.csv", numLinesToSkip = 1)
 	void datasourceTest(String producto, int sellIn, int quality, int sellInResult, int qualityResult) {
 		String name = producto.replace("\'", "");
-		assumeFalse("Conjured Mana Cake".equals(name));
+//		assumeFalse("Conjured Mana Cake".equals(name));
 		Item product = new Item(name, sellIn, quality);
         GildedRose app = new GildedRose(new Item[] { 
         		product
