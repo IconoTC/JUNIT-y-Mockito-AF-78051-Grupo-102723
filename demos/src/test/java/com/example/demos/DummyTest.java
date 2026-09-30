@@ -6,9 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.doubleThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +59,7 @@ class DummyTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		fixure = new Dummy();
+		fixure = new DummyImpl();
 	}
 
 	@Nested
@@ -63,7 +70,7 @@ class DummyTest {
 		class OK {
 			@Test
 			void test_Suma_dos_enteros() {
-				var c = new Dummy();
+				var c = new DummyImpl();
 				
 				var actual = c.suma(1, 2);
 				
@@ -72,7 +79,7 @@ class DummyTest {
 			
 			@Test
 			void test_Suma_dos_decimales() {
-				var c = new Dummy();
+				var c = new DummyImpl();
 				
 				assertEquals(3.0, c.suma(2.0, 1.0));
 			}
@@ -81,7 +88,7 @@ class DummyTest {
 			@Test
 			@Timeout(unit = TimeUnit.SECONDS, value = 100)
 			void test_Suma_Lenta() throws InterruptedException {
-				var c = new Dummy();
+				var c = new DummyImpl();
 				
 //				assertTimeout(Duration.ofMillis(10), () -> result = c.sumaLenta(2.0, 1.0));
 //				assertEquals(3.0, result);
@@ -122,7 +129,7 @@ class DummyTest {
 			@Test
 			@DisplayName("Valida el error de precisión IEEE754")
 			void testSumaIEEE() {
-				var c = new Dummy();
+				var c = new DummyImpl();
 				
 				var actual = c.suma(0.1, 0.2);
 				
@@ -231,5 +238,55 @@ class DummyTest {
 			assertFalse(actual);
 		}
 	}
+	
+	@Nested
+	@Order(1)
+	class Dobles_de_Prueba {
+		@Test
+		void test_Suma_dos_enteros() {
+			var mock = mock(Dummy.class);
+//			when(mock.suma(1, 2)).thenReturn(4.0).thenReturn(3.0);
+//			when(mock.suma(2, 2)).thenReturn(3.0);
+//			when(mock.suma(anyDouble(), anyDouble())).thenReturn(4.0).thenReturn(3.0);
+			when(mock.suma(doubleThat(arg -> arg >= 0), anyDouble())).thenReturn(3.0);
+			when(mock.suma(doubleThat(arg -> arg < 0), anyDouble())).thenReturn(-3.0);
+			doReturn(1.0).when(mock).divide(anyDouble(), anyDouble());
+			
+			var actual = mock.suma(1, 2);
+			
+			assertEquals(3.0,  actual);
+			assertEquals(3,  mock.suma(1, 2));
+			assertEquals(3,  mock.suma(2, 2));
+			assertEquals(3,  mock.suma(0, 0));
+			assertEquals(-3,  mock.suma(-2, 2));
+			assertEquals(1,  mock.divide(22.0, 2));
+		}
+		@Test
+		void test_Suma_dos_enteros_ko() {
+			var mock = mock(Dummy.class);
+			when(mock.suma(anyDouble(), anyDouble())).thenThrow(new ArithmeticException("Suma mala"));
+			
+			var ex = assertThrows(ArithmeticException.class, () -> mock.suma(1.0, 0.0));
+			assertEquals("Suma mala", ex.getMessage());
+		}
+		@Test
+		void test_Suma_dos_enteros_clase() {
+			var mock = mock(DummyImpl.class);
+			when(mock.suma(1, 2)).thenReturn(4.0).thenReturn(3.0);
+//			when(mock.suma(doubleThat(arg -> arg >= 0), anyDouble())).thenReturn(3.0);
+//			when(mock.suma(doubleThat(arg -> arg < 0), anyDouble())).thenReturn(-3.0);
+//			doReturn(1.0).when(mock).divide(anyDouble(), anyDouble());
+			when(mock.divide(anyDouble(), anyDouble())).thenCallRealMethod();
+			var actual = mock.suma(1, 2);
+			
+			assertEquals(4.0,  actual);
+			assertEquals(11,  mock.divide(22.0, 2));
+		}
+		@Test
+		void test_Tiempo() {
+			var nacimiento = LocalDate.of(2000, 10, 1);
 
+			assertEquals(25,  fixure.edad(nacimiento));
+		}
+	}
 }
