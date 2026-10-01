@@ -8,8 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.doubleThat;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.InvocationTargetException;
@@ -37,6 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
 
 import com.example.test.anotations.Smoke;
 import com.example.test.anotations.UnitTest;
@@ -283,10 +286,17 @@ class DummyTest {
 			assertEquals(11,  mock.divide(22.0, 2));
 		}
 		@Test
-		void test_Tiempo() {
+		void test_Tempodependiente() {
 			var nacimiento = LocalDate.of(2000, 10, 1);
 
-			assertEquals(25,  fixure.edad(nacimiento));
+//			assertEquals(25,  fixure.edad(nacimiento));
+				
+			var hoy = LocalDate.of(2026, 9, 30);
+//			var hoy = LocalDate.of(2026, 10, 1);
+			try (MockedStatic<LocalDate> mocked = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
+				mocked.when(LocalDate::now).thenReturn(hoy);
+				assertEquals(25,  fixure.edad(nacimiento));
+			}
 		}
 	}
 }
