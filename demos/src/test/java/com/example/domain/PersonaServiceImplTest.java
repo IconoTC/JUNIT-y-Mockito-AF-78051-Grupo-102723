@@ -2,6 +2,7 @@ package com.example.domain;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -89,10 +91,22 @@ class PersonaServiceImplTest {
 //		fail("Not yet implemented");
 //	}
 
-//	@Test
-//	void testGetAll() {
-//		fail("Not yet implemented");
-//	}
+	@Test
+	void testGetAll() {
+		List<Persona> lista = List.of(
+				new Persona(1, "xxxx", "xxx", null),
+				new Persona(2, "xxxx", "xxx", null),
+				new Persona(3, "xxxx", "xxx", null),
+				new Persona(4, "xxxx", "xxx", null)
+				);
+		when(dao.read()).thenReturn(lista);
+		
+		var actual = srv.getAll();
+		
+		assertEquals(4, actual.size());
+		assertIterableEquals(lista, actual);
+	}
+	
 //
 //	@Test
 //	void testGetOne() {
